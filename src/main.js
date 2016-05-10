@@ -1,9 +1,10 @@
-let foo = ({x = 10} = {}, {y} = {y: 10}) => {
-  console.log(x,y);
+let obj = {
+  //id: 10,
+  test: 'kupa',
+  get id() { return this.test },
+  set id(v) { this.test = v }
 };
-
-
-let bar = ({x = 10, y = 20} = {}) => {
-  console.log(x, y);
-};
-bar({y: 200});
+console.log(obj.id);
+obj.id = 'dupa';
+console.log(obj.id);
+console.log(obj.id);
