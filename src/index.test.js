@@ -7,16 +7,12 @@ describe('Our first test', () => {
   });
 });
 
-const todo = (state, action) => {
-  switch(action.type) {
+const todoReducer = (state = {}, action) => {
+  switch (action.type) {
     case 'ADD_TODO':
-      return {
-        id: action.id,
-        text: action.text,
-        completed: false
-      };
+      return {id: action.id, text: action.text, completed: false};
     case 'TOGGLE_TODO':
-      if(state.id !== action.id ) {
+      if(state.id !== action.id) {
         return state;
       }
       return Object.assign({}, state, {completed: !state.completed});
@@ -25,46 +21,48 @@ const todo = (state, action) => {
   }
 };
 
-const todos = (state = [], action) => {
-  switch(action.type) {
+const todosReducer = (state = [], action) => {
+  switch (action.type) {
     case 'ADD_TODO':
-      return [...state, todo(undefined, action)];
+      return [...state, todoReducer(undefined, action)];
     case 'TOGGLE_TODO':
-      return state.map(item => todo(item, action));
+      return state.map(todo => {
+        return todoReducer(todo, action);
+      });
     default:
       return state;
   }
 };
 
-const testTodos = () => {
+const testAddTodo = () => {
   const stateBefore = [];
   const action = {
     type: 'ADD_TODO',
     id: 0,
-    text: 'Learn Redux'
+    text: 'Some text'
   };
   const stateAfter = [
     {
       id: 0,
-      text: 'Learn Redux',
+      text: 'Some text',
       completed: false
     }
   ];
   deepFreeze(stateBefore);
   deepFreeze(action);
-  expect(todos(stateBefore, action)).toEqual(stateAfter);
+  expect(todosReducer(stateBefore, action)).toEqual(stateAfter);
 };
 
 const testToggleTodo = () => {
   const stateBefore = [
     {
       id: 0,
-      text: 'Jestem 0',
+      text: 'Some text 1',
       completed: false
     },
     {
       id: 1,
-      text: 'Jestem 1!',
+      text: 'Some text 2',
       completed: false
     }
   ];
@@ -75,20 +73,20 @@ const testToggleTodo = () => {
   const stateAfter = [
     {
       id: 0,
-      text: 'Jestem 0',
+      text: 'Some text 1',
       completed: false
     },
     {
       id: 1,
-      text: 'Jestem 1!',
+      text: 'Some text 2',
       completed: true
     }
   ];
   deepFreeze(stateBefore);
   deepFreeze(action);
-  expect(todos(stateBefore, action)).toEqual(stateAfter);
+  expect(todosReducer(stateBefore, action)).toEqual(stateAfter);
 };
 
-testTodos();
+testAddTodo();
 testToggleTodo();
 console.log('All tests passed');
