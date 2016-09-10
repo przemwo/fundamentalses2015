@@ -1,5 +1,6 @@
 import expect from 'expect';
 import deepFreeze from 'deep-freeze';
+import { createStore } from 'redux';
 
 describe('Our first test', () => {
   it('should pass', () => {
@@ -26,13 +27,37 @@ const todosReducer = (state = [], action) => {
     case 'ADD_TODO':
       return [...state, todoReducer(undefined, action)];
     case 'TOGGLE_TODO':
-      return state.map(todo => {
-        return todoReducer(todo, action);
-      });
+      return state.map(todo => todoReducer(todo, action));
     default:
       return state;
   }
 };
+
+const visibilityFilterReducer = (state = 'SHOW_ALL', action) => {
+  switch (action.type) {
+    case 'SET_VISIBILITY_FILTER':
+      return action.filter;
+    default:
+      return state;
+
+  }
+};
+
+const todoAppReducer = (state = {}, action) => {
+  return {
+    todos: todosReducer(state.todos, action),
+    visibility: visibilityFilterReducer(state.visibility, action)
+  };
+};
+
+const combineReducers = (reducers = {}) => {
+  return (state = {}, action) => {
+    return Object.keys(reducers).reduce((nextState, key) => {
+      nextState[key] = reducers[key](state[key], action);
+      return nextState;
+    }, {});
+  };
+}
 
 const testAddTodo = () => {
   const stateBefore = [];
