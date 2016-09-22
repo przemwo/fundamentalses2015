@@ -1,306 +1,79 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import { createStore, combineReducers } from 'redux';
-import { Provider } from 'react-redux';
-import { connect } from 'react-redux';
+// FUNCTIONAL PROGRAMMING
 
-const todoReducer = (state = {}, action) => {
-  switch (action.type) {
-    case 'ADD_TODO':
-      return {id: action.id, text: action.text, completed: false};
-    case 'TOGGLE_TODO':
-      if(state.id !== action.id) {
-        return state;
-      }
-      return Object.assign({}, state, {completed: !state.completed});
-    default:
-      return state;
-  }
-};
+const animals = [
+  { name: 'Ted', species: 'dog', age: 10 },
+  { name: 'Adam', species: 'rabbit', age: 15 },
+  { name: 'Ewa', species: 'cat', age: 10 },
+  { name: 'Max', species: 'dog', age: 20 }
+];
 
-const todos = (state = [], action) => {
-  switch (action.type) {
-    case 'ADD_TODO':
-      return [...state, todoReducer(undefined, action)];
-    case 'TOGGLE_TODO':
-      return state.map(todo => todoReducer(todo, action));
-    default:
-      return state;
-  }
-};
+// 1. GOAL: get all dogs
 
-const visibilityFilter = (state = 'SHOW_ALL', action) => {
-  switch (action.type) {
-    case 'SET_VISIBILITY_FILTER':
-      return action.filter;
-    default:
-      return state;
-
-  }
-};
-
-const todoApp = combineReducers({todos, visibilityFilter});
-
-// ACTION CREATORS
-const addTodo = (text) => {
-  return {
-    type: 'ADD_TODO',
-    id: nextTodoId++,
-    text: text
-  };
-};
-
-const setVisibilityFilter = (filter) => {
-  return {
-    type: 'SET_VISIBILITY_FILTER',
-    filter: filter
-  }
-};
-
-const toggleTodo = (id) => {
-  return {
-    type: 'TOGGLE_TODO',
-    id: id
-  }
-};
-
-
-const Todo = ({
-  onClick,
-  text,
-  completed
-}) => (
-  <li
-    onClick={onClick}
-    style={{
-      textDecoration: completed ? 'line-through' : 'none'
-    }}>
-    {text}
-  </li>
-);
-
-() => {
-  store.dispatch({
-    type: 'TOGGLE_TODO',
-    id: todo.id
-  });
-}
-
-const TodoList = ({
-  todos,
-  onTodoClick
-}) => (
-  <ul>
-    {todos.map(todo =>
-      <Todo
-        key={todo.id}
-        {...todo}
-        onClick={() => onTodoClick(todo.id)}
-       />
-    )}
-  </ul>
-);
-
-let nextTodoId = 0;
-let AddTodo = ({ dispatch }) => {
-  let input;
-  return (
-    <div>
-      <input ref={node => {
-          input = node;
-        }} />
-      <button onClick={()=>{
-          dispatch(addTodo(input.value));
-          input.value = '';
-        }}>Add todo</button>
-    </div>
-  );
-};
-const mapDispatchToAddTodoProps = (dispatch) => {
-  return { dispatch };
-};
-AddTodo = connect()(AddTodo) // if no arguments is provided to connect - dispatch is sending via props
-
-
-const Link = ({
-  active,
-  onClick,
-  children
-}) => {
-  if(active) {
-    return <span>{children}</span>
-  }
-  return (
-    <a href='#'
-      onClick={e => {
-        e.preventDefault();
-        onClick();
-      }}>
-      {children}
-    </a>
-  );
-};
-
-// class FilterLink extends React.Component {
-//   componentDidMount() {
-//     const { store } = this.context;
-//     this.unsubscribe = store.subscribe(() => this.forceUpdate());
-//   }
-//   componentWillUnmount() {
-//     this.unsubscribe();
-//   }
-//   render () {
-//     const props = this.props;
-//     const { store } = this.context;
-//     const state = store.getState();
-//     return (
-//       <Link
-//         active={
-//           props.filter === state.visibilityFilter
-//         }
-//         onClick={() =>
-//           store.dispatch({
-//             type: 'SET_VISIBILITY_FILTER',
-//             filter: props.filter
-//           })
-//         }
-//       >
-//         {props.children}
-//       </Link>
-//     );
+// NOT functional
+// const dogs = [];
+// for(let i =0; i < animals.length; i++) {
+//   if(animals[i].species === 'dog') {
+//     dogs.push(animals[i]);
 //   }
 // }
-// FilterLink.contextTypes = {
-//   store: React.PropTypes.object
-// };
-const mapStateToLinkProps = (state, ownProps) => {
-  return {
-    active:ownProps.filter === state.visibilityFilter
-  };
-};
-const mapDispatchToLinkProps = (dispatch, ownProps) => {
-  return {
-    onClick: () => {
-      dispatch(setVisibilityFilter(ownProps.filter));
-    }
-  };
-};
- const FilterLink = connect(mapStateToLinkProps, mapDispatchToLinkProps)(Link);
+
+// FILTER
+// in this example .filter() is a Higher-order function (a function that takes another function as an argument)
+const isDog = (animal) => animal.species === 'dog';
+const dogs = animals.filter(isDog);
+
+console.log(dogs);
 
 
-const Footer = () => (
-    <p>
-      Show:
-      {' '}
-      <FilterLink
-        filter='SHOW_ALL'
-      >
-        All
-      </FilterLink>
-      {' '}
-      <FilterLink
-        filter='SHOW_ACTIVE'
-      >
-        Active
-      </FilterLink>
-      {' '}
-      <FilterLink
-        filter='SHOW_COMPLETED'
-      >
-        Completed
-      </FilterLink>
-    </p>
-);
 
+// 2. GOAL: get all names
 
-const getVisibleTodos = (todos, filter) => {
-  switch (filter) {
-    case 'SHOW_ALL':
-      return todos;
-    case 'SHOW_ACTIVE':
-      return todos.filter(todo => !todo.completed);
-    case 'SHOW_COMPLETED':
-      return todos.filter(todo => todo.completed);
-    default:
-      return todos;
-  }
-};
-
-const mapStateToTodoListProps = (state) => {
-  return {
-    todos: getVisibleTodos(state.todos, state.visibilityFilter)
-  };
-};
-const mapDispatchToTodoListProps = (dispatch) => {
-  return {
-    onTodoClick: (id) => {
-      dispatch(toggleTodo(id));
-    }
-  };
-};
-const VisibleTodoList = connect(mapStateToTodoListProps, mapDispatchToTodoListProps)(TodoList);
-
-// It's all is done by connect React-Redux function
-// class VisibleTodoList extends React.Component {
-//   componentDidMount() {
-//     const { store } = this.context;
-//     this.unsubscribe = store.subscribe(() => this.forceUpdate());
-//   }
-//   componentWillUnmount() {
-//     this.unsubscribe();
-//   }
-//
-//   render () {
-//     const props = this.props;
-//     const { store } = this.context;
-//     const state = store.getState();
-//
-//     return (
-//       <TodoList
-//         todos={
-//           getVisibleTodos(state.todos, state.visibilityFilter)
-//         }
-//         onTodoClick={(id) => {
-//           store.dispatch({
-//             type: 'TOGGLE_TODO',
-//             id: id
-//           })
-//         }}
-//
-//         />
-//     );
-//   }
+// Not functional
+// const names = [];
+// for(let i = 0; i < animals.length; i++) {
+//   names.push(animals[i].name);
 // }
-// VisibleTodoList.contextTypes = {
-//   store: React.PropTypes.object
-// };
 
-const TodoApp = () => (
-    <div>
-      <AddTodo />
-      <VisibleTodoList />
-      <Footer />
-    </div>
-);
+// MAP
+const names = animals.map(animal => animal.name);
 
-// Implementation of React-Redux Provider
-// class Provider extends React.Component {
-//   getChildContext() {
-//     return {
-//       store: this.props.store
-//     };
-//   }
-//   render () {
-//     return this.props.children;
-//   }
+console.log(names);
+
+
+
+// GOAL: sum age of all animals
+
+// Not functional
+// let total = 0;
+// for(let i = 0; i < animals.length; i++) {
+//   total += animals[i].age;
 // }
-// Provider.childContextTypes = {
-//   store: React.PropTypes.object
-// };
 
-ReactDOM.render(
-  <Provider store={createStore(todoApp)}>
-    <TodoApp />
-  </Provider>,
-  document.getElementById('app')
-);
+// REDUCE 1
+const total = animals.reduce((sum, animal) => sum += animal.age, 0);
+
+console.log(total);
+
+// REDUCE 2
+// GOAL: take data const and transofrm it into object
+const data = `
+Ted	dog	10
+Adam	rabbit	15
+Ted	cat	10
+Adam	dog	20
+`;
+
+const obj = data
+  .trim()
+  .split('\n')
+  .map(line => line.split('\t'))
+  .reduce((target, line) => {
+    target[line[0]] = target[line[0]] || [];
+    target[line[0]].push({
+        species: line[1],
+        aga: line[2]
+    });
+    return target;
+  }, {});
+
+console.log(JSON.stringify(obj, null, 2));
