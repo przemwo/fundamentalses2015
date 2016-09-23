@@ -7,6 +7,7 @@ const animals = [
   { name: 'Max', species: 'dog', age: 20 }
 ];
 
+
 // 1. GOAL: get all dogs
 
 // NOT functional
@@ -77,3 +78,68 @@ const obj = data
   }, {});
 
 console.log(JSON.stringify(obj, null, 2));
+
+
+
+// CLOSURES
+const foo = () => {
+  let counter = 0;
+  const increment = () => {
+    counter++;
+  };
+  const decrement = () => {
+    counter--;
+  };
+  const show = () => {
+    console.log(counter);
+  };
+  return {
+    show,
+    increment,
+    decrement
+  };
+};
+
+const counter = foo();
+counter.show();
+counter.increment();
+counter.increment();
+counter.decrement();
+counter.show();
+
+
+
+// CURRYING - when a function pass through the application and gradually receives arguments it needs
+// NO currying
+let dragon = (name, size, element) => `${name} is a ${size} dragon that breaths ${element}!`;
+console.log(dragon('Adam', 'big', 'lightning'));
+
+// Currying
+let otherDragon = name =>
+  size =>
+   element => `${name} is a ${size} dragon that breaths ${element}!`;
+console.log(otherDragon('Jan')('big')('water')); //you can chain the calls...
+//...or you can make every step a function
+let janDragon = otherDragon('Jan');
+let bigJanDragon = janDragon('big');
+let waterBigJanDragon = bigJanDragon('water');
+console.log(waterBigJanDragon);
+
+
+// Currying Example
+// GOAL: get all dogs from animals
+// NO currying:
+// const isAnimalSpecies = (obj, species) => {
+//   return obj.species === species;
+// };
+// const dogsOnly = animals.filter(animal => {
+//     return isAnimalSpecies(animal, 'dog');
+// });
+// Currying:
+const isAnimalSpecies =
+  species =>
+    obj => obj.species === species;
+
+const dogsOnly = animals.filter(isAnimalSpecies('dog'));
+
+console.log(JSON.stringify(dogsOnly, null, 2));
