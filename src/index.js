@@ -18,7 +18,7 @@ const animals = [
 //   }
 // }
 
-// FILTER
+// !!! FILTER
 // in this example .filter() is a Higher-order function (a function that takes another function as an argument)
 const isDog = (animal) => animal.species === 'dog';
 const dogs = animals.filter(isDog);
@@ -35,7 +35,7 @@ console.log(dogs);
 //   names.push(animals[i].name);
 // }
 
-// MAP
+// !!! MAP
 const names = animals.map(animal => animal.name);
 
 console.log(names);
@@ -50,12 +50,12 @@ console.log(names);
 //   total += animals[i].age;
 // }
 
-// REDUCE 1
+// !!! REDUCE 1
 const total = animals.reduce((sum, animal) => sum += animal.age, 0);
 
 console.log(total);
 
-// REDUCE 2
+// !!! REDUCE 2
 // GOAL: take data const and transofrm it into object
 const data = `
 Ted	dog	10
@@ -81,7 +81,7 @@ console.log(JSON.stringify(obj, null, 2));
 
 
 
-// CLOSURES
+// !!! CLOSURES
 const foo = () => {
   let counter = 0;
   const increment = () => {
@@ -109,7 +109,7 @@ counter.show();
 
 
 
-// CURRYING - when a function pass through the application and gradually receives arguments it needs
+// !!! CURRYING - when a function pass through the application and gradually receives arguments it needs
 // NO currying
 let dragon = (name, size, element) => `${name} is a ${size} dragon that breaths ${element}!`;
 console.log(dragon('Adam', 'big', 'lightning'));
@@ -143,3 +143,55 @@ const isAnimalSpecies =
 const dogsOnly = animals.filter(isAnimalSpecies('dog'));
 
 console.log(JSON.stringify(dogsOnly, null, 2));
+
+
+// !!! RECURSION
+// when a function call itself... until it doesn't
+
+// Recursion - count number from 10 to 1
+const countDown = (number) => {
+  console.log(number);
+  if(number > 1) {
+    countDown(number - 1);
+  }
+};
+countDown(10);
+
+// Recursion - make n tree like object from input data:
+const recursionInput = [
+  { id: 'A', parent: null },
+  { id: 'AA', parent: 'A' },
+  { id: 'AAA', parent: 'AA' },
+  { id: 'AAB', parent: 'AA' },
+  { id: 'AAC', parent: 'AA' },
+  { id: 'AB', parent: 'A' },
+  { id: 'ABA', parent: 'AB' },
+  { id: 'ABB', parent: 'AB' }
+];
+
+// TURN IT INTO THIS:
+// A: {
+//   AA: {
+//     AAA: null,
+//     AAB: null,
+//     AAC: null
+//   },
+//   AB: {
+//     ABA: null,
+//     ABB: null
+//   }
+// }
+
+const makeTree = (categories, parent) => {
+  let node = {};
+  categories
+    .filter(c => c.parent === parent)
+    .forEach(c => node[c.id] = makeTree(categories, c.id));
+  if(Object.keys(node).length === 0) {
+    return null;
+  }
+  return node;
+};
+console.log(
+  JSON.stringify(makeTree(recursionInput, null), null, 2)
+);
