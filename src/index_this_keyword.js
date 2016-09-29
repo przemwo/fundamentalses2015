@@ -32,11 +32,11 @@ obj.fn();
 // 1.3
 let ClassName = function() {
   this.fn = function() {
-    console.log(1.3, this === classIntance); // true
+    console.log(1.3, this === classInstance); // true
   };
 };
-let classIntance = new ClassName();
-classIntance.fn();
+let classInstance = new ClassName();
+classInstance.fn();
 
 // 1.4
 fn = function() {
@@ -55,7 +55,15 @@ fn();
 // 2
 obj = {
   fn: () => {
-    console.log(2, this === undefined); // true in strict mode/ES6 modules, otherwise global (window in a browser)
+    console.log(2.1, this === undefined); // true in strict mode/ES6 modules, otherwise global (window in a browser)
+  },
+  otherFn: function() {
+    console.log(2.2, this === obj); // true
+    const tmp = () => {
+      console.log(2.3, this === obj); // true because inside otherFn 'this' is 'obj'
+    };
+    tmp(); // it's not "normal" function invocation (see 1.1), tmp is an arrow so 'this' is set to 'this' where tmp is DEFINED
   }
 };
 obj.fn(); // it's not "normal" method invocation (see 1.2), fn is an arrow so 'this' is set to 'this' where fn is DEFINED
+obj.otherFn();
