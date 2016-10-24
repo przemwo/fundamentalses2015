@@ -55,8 +55,24 @@ class Point {
 
 const p1 = new Point(5,5);
 const p2 = new Point(10,10);
-let distance = Point.distance(p1, p2);
+let distance = Point.distance(p1, p2); // I can use 'distance' property without instantiating a class!
 console.log(distance);
+
+// More on static methods
+class Circle {
+  // static method
+  static foo() {
+    console.log(`I'm foo!`);
+  }
+  // instance method
+  bar() {
+    console.log(`I'm bar!`);
+  }
+}
+const circle = new Circle();
+Circle.foo(); // => I'm foo
+// circle.foo(); // => TypeError: circle.foo is not a function !!!
+circle.bar(); // => I'm bar
 
 
 
@@ -130,13 +146,13 @@ person2.age = '38';
 //we can override default prototype methods, eg. toString method
 let person3 = {
   name: 'Jan',
-  toString: function() {
+  toString: function() { //override toString method
     return this.name;
   }
 };
 
 let test = {
-  test: 'dupa'
+  test: 'some test text'
 };
 Object.setPrototypeOf(test, Vehicle);
 
