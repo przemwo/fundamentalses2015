@@ -1,11 +1,13 @@
 // THIS
 
-// 1. function() - ask how the function is INVOKED?
-  // 1.1 fn() --> functino invocation: 'this' is global object or undefined (in strict mode, ES6 modules)
+// 'this' is the current execution context of a function
+
+// 1. function() - if you want to know what 'this' is in a function body, ask how the function was INVOKED?
+  // 1.1 fn() --> function invocation: 'this' is global object or undefined (in strict mode, ES6 modules)
   // 1.2 obj.fn() --> method invocation: 'this' is obj
   // 1.3 const obj = new ClassName() --> constructor invocation: 'this' is newly created object (obj)
   // 1.4 fn.call(context, arg) / fn.apply(context, [arg]) --> indirect invocation: 'this' is the firt argument of call/apply (context)
-  // 1.5 foo = fn.bind(context) --> bound function: return a copy of fn function where 'this' is the first argument of bind
+  // 1.5 foo = fn.bind(context) --> bound function: return a COPY of fn function where 'this' is the first argument of bind. The original and bound function share the same code and scope. But have dirrerent contexts of execution.
 
 // 2. arrow function: () => {} - ask what is 'this' where the arrow function is DEFINED?
 
