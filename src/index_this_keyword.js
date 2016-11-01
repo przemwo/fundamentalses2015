@@ -9,7 +9,7 @@
   // 1.4 fn.call(context, arg) / fn.apply(context, [arg]) --> indirect invocation: 'this' is the firt argument of call/apply (context)
   // 1.5 foo = fn.bind(context) --> bound function: return a COPY of fn function where 'this' is the first argument of bind. The original and bound function share the same code and scope. But have dirrerent contexts of execution.
 
-// 2. arrow function: () => {} - ask what is 'this' where the arrow function is DEFINED?
+// 2. arrow function: () => {} - ask what is 'this' (during execution) where the arrow function is DEFINED?
 
 
 // EXAMPLES
