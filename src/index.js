@@ -64,60 +64,62 @@ let Stack = (function() {
 
 // ProjectsApi mock up
 class ProjectsApi {
-  constructor(data) {
-    this.data = data;
+  constructor(apiMethodsConfig) {
+    this.apiMethodsConfig = apiMethodsConfig;
   }
 
+  // Prepares response for a method call
   getResponse(methodName, args) {
-    if(!this.data || !Object.keys(this.data).find(key => key === methodName)) {
-      console.warn(`Response data for api method: ${methodName} were not set in ProjectsApiStub constructor method`)
+    // When provided no responses for the method
+    if(!this.apiMethodsConfig || !this.apiMethodsConfig[methodName]) {
+      console.warn(`Response data for api method:${methodName} were not set.`)
       return null;
     }
-    let res;
-    for(const [key, val] of Object.entries(this.data)) {
-      if(key === methodName) {
-        if(val.constructor === Array) {
-          val.forEach(item => {
-            item.params = item.params || [];
-            if(JSON.stringify(item.params) === JSON.stringify(args)) {
-              res = item.response;
-            }
-          });
-        } else {
-          res = val;
-        }
-      }
+
+    // When provided only one response as an object
+    if(this.apiMethodsConfig[methodName].constructor !== Array) {
+      return this.apiMethodsConfig[methodName];
     }
-    return res;
+
+    // When provided reponse(s) as an array
+    const apiMethodCall = this.apiMethodsConfig[methodName].filter(apiMethodCallConfig => {
+      if(apiMethodCallConfig.params) {
+        return JSON.stringify(apiMethodCallConfig.params) === JSON.stringify(args);
+      } else {
+        return args.length === 0;
+      }
+    });
+    return ((apiMethodCall[0] && apiMethodCall[0].response) || null);
   }
 
+  // API methods
   getUserName(...args) {
-    const response = this.getResponse('getUserName', args) || 'error';
+    const response = this.getResponse('getUserName', args) || 'default response';
     return response;
   }
 
   getProject(...args) {
-    const response = this.getResponse('getProject', args) || 'error';
+    const response = this.getResponse('getProject', args) || 'default response';
     return response;
   }
 
   getData(...args) {
-    const response = this.getResponse('getData', args) || 'error';
+    const response = this.getResponse('getData', args) || 'default response';
     return response;
   }
 
   dupa(...args) {
-    const response = this.getResponse('dupa', args) || 'error';
+    const response = this.getResponse('dupa', args) || 'default response';
     return response;
   }
 }
 
 // Initial data
-const initData = {
+const apiMethodsConfig = {
   // many responses, for many params
   getUserName: [
     {
-      response: 'podaj id',
+      response: 'name when no params',
     },
     {
       params: [1],
@@ -134,13 +136,59 @@ const initData = {
       response: 'some data'
     }
   ],
-  // one response, no params shortcut
+  // // one response, no params shortcut
   getProject: {a: 'some data'},
 };
-const api = new ProjectsApi(initData);
+const api = new ProjectsApi(apiMethodsConfig);
 
 // Using api mock up
-console.log('USER: ', api.getUserName(1));
+console.log('USER: ', api.getUserName());
 console.log('PROJECT: ', api.getProject(333));
 console.log('DATA: ', api.getData());
 console.log('DUPA: ', api.dupa());
+
+// EXAMPLES
+// Always return 'Tomasz', no matter what args are
+api.apiMethodsConfig.getUserName = 'Tomasz';
+console.log('=====================================');
+console.log('USER: ', api.getUserName());  //Tomasz
+console.log('USER: ', api.getUserName(1));  //Tomasz
+console.log('USER: ', api.getUserName(333));  //Tomasz
+
+// Returns Piotr when no args, otherwise default value
+api.apiMethodsConfig.getUserName = [
+  {
+    response: 'Piotr',
+  }
+];
+console.log('=====================================');
+console.log('USER: ', api.getUserName());  //Piotr
+console.log('USER: ', api.getUserName(1));  //default value
+console.log('USER: ', api.getUserName(333));  //default value
+
+// Returns Wojciech for arg === 1, otherwise default value
+api.apiMethodsConfig.getUserName = [
+  {
+    params: [1],
+    response: 'Wojciech',
+  }
+];
+console.log('=====================================');
+console.log('USER: ', api.getUserName());  //default value
+console.log('USER: ', api.getUserName(1));  //Wojciech
+console.log('USER: ', api.getUserName(333));  //default value
+
+// Returns Piotr when no args, Wojciech for arg === 1,  otherwise default value
+api.apiMethodsConfig.getUserName = [
+  {
+    response: 'Piotr',
+  },
+  {
+    params: [1],
+    response: 'Wojciech',
+  }
+];
+console.log('=====================================');
+console.log('USER: ', api.getUserName());  //Piotr
+console.log('USER: ', api.getUserName(1));  //Wojciech
+console.log('USER: ', api.getUserName(333));  //default value
