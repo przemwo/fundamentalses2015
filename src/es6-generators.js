@@ -43,3 +43,95 @@ console.log(it.next()); //6, false
 console.log(it.next(12)); // 8, false
 console.log(it.next(13)); // 42, true
 console.log(it.next(100)); // undefined, true
+
+
+console.log('==================================');
+
+
+// Error handling
+
+// 1. Inside generator
+// 1.1 Passed from outside by .throw(), handled by generator
+function *baz() {
+  try {
+    var x = yield 3;
+    console.log('hi!'); //we never get here
+  } catch(err) {
+    console.log('Error: ' + err);
+  }
+}
+it = baz();
+console.log(it.next());
+it.throw('Problem!');
+
+// 2. Outside generator
+// 2.1 Passed from outside, handled by the outside (thanks to right back propagation)
+// If not caught eventually will end up as an unhandled rejection
+function *fooa() {
+  var x = yield 4;
+  console.log('hi!'); //we never get here
+}
+it = fooa();
+console.log(it.next());
+try {
+  it.throw('Another problem!');
+} catch(err) {
+  console.log('Error: ' + err);
+}
+
+// 2.2 From inside generator, handled by the outside
+function *foob() {
+  var x = yield 3;
+  var z = x.tuUpperCase();
+  console.log('hi!'); // never get here
+}
+it = foob();
+console.log(it.next());
+try {
+  it.next(5); //we passe 5 to the foob. x becomes 5. Next we try to call .toUpperCase on 5 which trhows an error!
+} catch(err) {
+  console.log('Error: ' + err);
+}
+
+
+console.log('==================');
+
+
+// Delegating Generators using yield*
+function *baza() {
+  yield 3;
+  yield 4;
+  return 'baza!';
+}
+
+function *bazb() {
+  yield 1;
+  yield 2;
+  var x = yield *baza(); //here we delegate iteration control (the next() calls) to baza
+  console.log(x);
+  yield 5;
+  return 'bazb!!!';
+}
+it = bazb();
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+
+
+// Another example
+function *bazc() {
+  yield 1;
+  yield 2;
+  yield *['a', 'b', 'c']; // here can be any iterable object (eg. an array)
+  yield 3;
+}
+it = bazc();
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
